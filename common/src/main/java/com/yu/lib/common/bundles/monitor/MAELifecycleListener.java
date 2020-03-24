@@ -1,6 +1,7 @@
-package com.yu.bundles.monitorfragment;
+package com.yu.lib.common.bundles.monitor;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

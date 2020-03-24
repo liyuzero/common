@@ -1,4 +1,4 @@
-package com.yu.bundles.monitorfragment;
+package com.yu.lib.common.bundles.monitor;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,10 +7,10 @@ import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import java.io.File;
-
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
+
+import java.io.File;
 
 /**
  * @author: liyu10
@@ -30,7 +30,7 @@ class MaeInstallApkUtils {
         if(Build.VERSION.SDK_INT >= 26) {
             boolean hasInstallPermission = activity.getPackageManager().canRequestPackageInstalls();
             if (!hasInstallPermission) {
-                Toast.makeText(activity, activity.getString(R.string.mae_bundles_monitor_install_apk_tips), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(com.yu.bundles.monitorfragment.R.string.mae_bundles_monitor_install_apk_tips), Toast.LENGTH_SHORT).show();
                 Uri packageURI = Uri.parse("package:" + activity.getPackageName());
                 Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI);
                 activity.startActivityForResult(intent, REQUEST_CODE);

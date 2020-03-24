@@ -1,4 +1,4 @@
-package com.yu.bundles.monitorfragment;
+package com.yu.lib.common.bundles.monitor;
 
 import java.util.List;
 

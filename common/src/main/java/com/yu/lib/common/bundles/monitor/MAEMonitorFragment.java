@@ -1,4 +1,4 @@
-package com.yu.bundles.monitorfragment;
+package com.yu.lib.common.bundles.monitor;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -9,16 +9,16 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.AppOpsManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentManager;
-
-import android.text.TextUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.List;
  * 该Fragment提供生命周期监听和权限申请方法，因为二者实现原理一致，因此实现方法统一到该Fragment内
  */
 
-public class MAEMonitorFragment extends Fragment implements MAEPermissionRequest{
+public class MAEMonitorFragment extends Fragment implements MAEPermissionRequest {
     private static final String MONITOR_FRAGMENT_TAG = "YU_MONITOR_FRAGMENT_TAG";
     private MAELifecycleListener lifecycleListener;
     private MAEActivityResultListener resultListener;
