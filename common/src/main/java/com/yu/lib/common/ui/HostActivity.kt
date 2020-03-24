@@ -7,9 +7,9 @@ import android.text.TextUtils
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.yu.bundles.monitorfragment.MAEActivityResultListener
-import com.yu.bundles.monitorfragment.MAEMonitorFragment
 import com.yu.lib.common.R
+import com.yu.lib.common.bundles.monitor.MAEActivityResultListener
+import com.yu.lib.common.bundles.monitor.MAEMonitorFragment
 import java.lang.reflect.InvocationTargetException
 
 class HostActivity : AppCompatActivity() {
