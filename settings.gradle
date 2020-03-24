@@ -1,2 +1,3 @@
-include ':demo', ':common'
+include ':demo', ':common', ':bundle_monitorfragment'
+
 rootProject.name='YuCommon'
