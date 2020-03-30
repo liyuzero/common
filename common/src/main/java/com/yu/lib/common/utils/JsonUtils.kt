@@ -13,7 +13,7 @@ object JsonUtils {
         return Gson().fromJson(json, clazz)
     }
 
-    fun<T> parseList(json: String): List<T> {
+    fun<T> parseList(json: String): MutableList<T> {
         val typeToken = object : TypeToken<List<T>>() {}.type;
         return Gson().fromJson(json, typeToken)
     }
