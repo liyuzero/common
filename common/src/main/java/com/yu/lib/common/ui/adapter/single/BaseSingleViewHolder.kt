@@ -10,11 +10,14 @@ class BaseSingleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val mViewMap: SparseArray<View> = SparseArray()
 
     fun <V : View> getView(id: Int): V? {
-        var view: V? = mViewMap.get(id) as V
+        var view : View? = null
+        if(mViewMap.get(id) != null) {
+            view = mViewMap.get(id)
+        }
         if (view == null) {
             view = itemView.findViewById(id)
             mViewMap.put(id, view)
         }
-        return view
+        return view as V
     }
 }
