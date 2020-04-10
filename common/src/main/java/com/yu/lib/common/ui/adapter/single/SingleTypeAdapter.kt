@@ -1,4 +1,4 @@
-package com.yu.lib.common.ui.adapter
+package com.yu.lib.common.ui.adapter.single
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,7 @@ import java.util.HashSet
 abstract class SingleTypeAdapter<D>(
     private val mLayoutRes: Int,
     private val mData: MutableList<D>
-) : RecyclerView.Adapter<BaseViewHolder>() {
+) : RecyclerView.Adapter<BaseSingleViewHolder>() {
     private var mOnItemClickListener: OnItemClickListener? = null
     private var mOnItemLongClickListener: OnItemLongClickListener? = null
     private var mOnChildItemClickListener: OnChildItemClickListener? = null
@@ -18,8 +18,8 @@ abstract class SingleTypeAdapter<D>(
     val data: List<D>?
         get() = mData
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val holder = BaseViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSingleViewHolder {
+        val holder = BaseSingleViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 mLayoutRes,
                 parent,
@@ -51,11 +51,11 @@ abstract class SingleTypeAdapter<D>(
         return holder
     }
 
-    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        onBindData(holder, mData!![position], position)
+    override fun onBindViewHolder(holderSingle: BaseSingleViewHolder, position: Int) {
+        onBindData(holderSingle, mData!![position], position)
     }
 
-    protected abstract fun onBindData(holder: BaseViewHolder, data: D, position: Int)
+    protected abstract fun onBindData(holderSingle: BaseSingleViewHolder, data: D, position: Int)
 
     override fun getItemCount(): Int {
         return mData?.size ?: 0

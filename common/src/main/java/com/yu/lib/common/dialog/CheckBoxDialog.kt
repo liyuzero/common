@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yu.lib.common.CommonManager
 import com.yu.lib.common.R
-import com.yu.lib.common.ui.adapter.BaseViewHolder
-import com.yu.lib.common.ui.adapter.SingleTypeAdapter
+import com.yu.lib.common.ui.adapter.single.BaseSingleViewHolder
+import com.yu.lib.common.ui.adapter.single.SingleTypeAdapter
 
 class CheckBoxDialog(context: Context) : Dialog(context, R.style.dialog) {
     private val mBean: Bean
@@ -42,9 +42,9 @@ class CheckBoxDialog(context: Context) : Dialog(context, R.style.dialog) {
         recyclerView.layoutManager = LinearLayoutManager(context)
         val singleTypeAdapter = object : SingleTypeAdapter<String>(R.layout.common_check_box_dialog_custom, Arrays.asList(*mBean.items!!)) {
             @SuppressLint("ClickableViewAccessibility")
-            override fun onBindData(holder: BaseViewHolder, data: String, position: Int) {
-                (holder.itemView.findViewById<View>(R.id.info) as TextView).text = data
-                val checkBox = holder.itemView.findViewById<CheckBox>(R.id.checkBox)
+            override fun onBindData(holderSingle: BaseSingleViewHolder, data: String, position: Int) {
+                (holderSingle.itemView.findViewById<View>(R.id.info) as TextView).text = data
+                val checkBox = holderSingle.itemView.findViewById<CheckBox>(R.id.checkBox)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     checkBox.buttonTintList = ColorStateList.valueOf(CommonManager.getMainColor())
                 }
@@ -55,7 +55,7 @@ class CheckBoxDialog(context: Context) : Dialog(context, R.style.dialog) {
                 checkBox.setOnTouchListener { v, event ->
                     if (event.action == MotionEvent.ACTION_UP) {
                         if (!checkBox.isChecked) {
-                            mBean.curCheckBox = holder.layoutPosition
+                            mBean.curCheckBox = holderSingle.layoutPosition
                             checkBox.isChecked = true
                             if (mCurBox != null) {
                                 mCurBox!!.isChecked = false
