@@ -5,8 +5,8 @@ import com.google.gson.reflect.TypeToken
 
 object JsonUtils {
 
-    fun format(obj: Any) {
-        Gson().toJson(obj)
+    fun format(obj: Any): String {
+        return Gson().toJson(obj)
     }
 
     fun<T> parse(json: String, clazz: Class<T>): T {
