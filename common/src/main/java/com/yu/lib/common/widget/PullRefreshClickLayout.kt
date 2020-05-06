@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import com.yu.bundles.pullrefresh.PullRefreshLayout
 
-class NovelPullRefreshLayout(context: Context, attrs: AttributeSet?) :
+class PullRefreshClickLayout(context: Context, attrs: AttributeSet?) :
     PullRefreshLayout(context, attrs) {
     private var mIsMove: Boolean = false
     private var mPreY = 0f
