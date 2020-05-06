@@ -1,6 +1,6 @@
 package com.yu.lib.common.aspect;
 
-import android.text.TextUtils;
+/*import android.text.TextUtils;
 import android.view.View;
 
 import androidx.fragment.app.Fragment;
@@ -17,13 +17,13 @@ import org.aspectj.lang.annotation.Aspect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.List;*/
 
-@Aspect
+//@Aspect
 public class DynaPermissionAspect {
 
-    @Around("execution(@com.yu.lib.annotations.aspect.DynaPermission * *(..)) && @annotation(permission)")
-    public void dynaPermission(ProceedingJoinPoint joinPoint, DynaPermission permission) {
+    //@Around("execution(@com.yu.lib.annotations.aspect.DynaPermission * *(..)) && @annotation(permission)")
+    /*public void dynaPermission(ProceedingJoinPoint joinPoint, DynaPermission permission) {
         Object object = joinPoint.getThis();
         MAEPermissionRequest request;
         FragmentActivity activity;
@@ -94,6 +94,6 @@ public class DynaPermissionAspect {
                 }
             });
         }
-    }
+    }*/
 
 }

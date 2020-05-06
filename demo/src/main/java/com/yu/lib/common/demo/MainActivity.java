@@ -7,12 +7,12 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-/*import com.yu.lib.annotations.YuProcessor;
-import com.yu.lib.annotations.prossor.BindView;*/
+import com.yu.lib.annotations.YuProcessor;
+import com.yu.lib.annotations.prossor.BindView;
 
 public class MainActivity extends AppCompatActivity {
 
-    //@BindView
+    @BindView
     public TextView text;
 
     @Override
@@ -20,9 +20,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //YuProcessor.bind(this);
+        YuProcessor.bind(this);
 
-        text.setText("呵呵");
+        text.setText("findViewById 实现");
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
