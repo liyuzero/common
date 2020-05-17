@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.yu.lib.common.R
@@ -63,6 +65,17 @@ class HostActivity : AppCompatActivity() {
 
     interface HostActivityListener {
         fun onBackPressed(): Boolean
+    }
+
+    fun startFragmentWithAnim(shareView: View, fragment: Fragment, bundle: Bundle?) {
+        if(bundle != null) {
+            fragment.arguments = bundle
+        }
+        supportFragmentManager
+            .beginTransaction()
+            .addSharedElement(shareView, ViewCompat.getTransitionName(shareView)!!)
+            .replace(R.id.contentContainer, fragment)
+            .commit();
     }
 }
 
