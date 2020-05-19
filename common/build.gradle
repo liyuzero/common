@@ -43,6 +43,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     //common内部需要使用注解工具
-    implementation project(path: ':common_annotations')
-    annotationProcessor project(':common_annotations_processors')
+//    implementation project(path: ':common_annotations')
+  //  annotationProcessor project(':common_annotations_processors')
 }
