@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.DisplayMetrics
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -18,6 +19,13 @@ class HostActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val display = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(display)
+        val displayMetrics = resources.displayMetrics
+        displayMetrics.density = display.widthPixels / 360f
+        displayMetrics.densityDpi = (160 * displayMetrics.density).toInt()
+
         setContentView(R.layout.common_activity_host)
 
         var bundle: Bundle? = intent.getBundleExtra("params")
