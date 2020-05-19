@@ -2,8 +2,10 @@ package com.yu.lib.common.ui
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.transition.TransitionInflater
 import android.util.DisplayMetrics
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -79,10 +81,15 @@ class HostActivity : AppCompatActivity() {
         if(bundle != null) {
             fragment.arguments = bundle
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.sharedElementEnterTransition =
+                TransitionInflater.from(shareView.context).inflateTransition(android.R.transition.move)
+        }
         supportFragmentManager
             .beginTransaction()
             .addSharedElement(shareView, ViewCompat.getTransitionName(shareView)!!)
             .replace(R.id.contentContainer, fragment)
+            .addToBackStack(null)
             .commit();
     }
 }
