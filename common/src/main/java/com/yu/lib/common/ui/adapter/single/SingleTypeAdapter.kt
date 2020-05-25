@@ -15,7 +15,7 @@ abstract class SingleTypeAdapter<D>(
     private var mOnChildItemClickListener: OnChildItemClickListener? = null
     private var mChildIdSet: MutableSet<Int>? = null
 
-    val data: List<D>?
+    val data: MutableList<D>?
         get() = mData
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSingleViewHolder {
@@ -52,17 +52,23 @@ abstract class SingleTypeAdapter<D>(
     }
 
     override fun onBindViewHolder(holderSingle: BaseSingleViewHolder, position: Int) {
-        onBindData(holderSingle, mData!![position], position)
+        onBindData(holderSingle, mData[position], position)
     }
 
     protected abstract fun onBindData(holderSingle: BaseSingleViewHolder, data: D, position: Int)
 
     override fun getItemCount(): Int {
-        return mData?.size ?: 0
+        return mData.size ?: 0
     }
 
-    fun setNewData(data: List<D>) {
-        mData!!.clear()
+    fun notifyData(data: MutableList<D>) {
+        mData.clear()
+        mData.addAll(data)
+        notifyDataSetChanged()
+    }
+
+    fun setNewData(data: MutableList<D>) {
+        mData.clear()
         mData.addAll(data)
         notifyDataSetChanged()
     }
