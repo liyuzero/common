@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yu.lib.common" >
     <application>
-        <activity android:name=".ui.HostActivity"/>
+        <activity
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:name=".ui.HostActivity"/>
     </application>
 </manifest>

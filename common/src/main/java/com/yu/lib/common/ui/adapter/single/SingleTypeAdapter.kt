@@ -3,7 +3,9 @@ package com.yu.lib.common.ui.adapter.single
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.yu.lib.common.ui.adapter.DiffCallback
 import java.util.HashSet
 
 abstract class SingleTypeAdapter<D>(
@@ -62,9 +64,8 @@ abstract class SingleTypeAdapter<D>(
     }
 
     fun notifyData(data: MutableList<D>) {
-        mData.clear()
-        mData.addAll(data)
-        notifyDataSetChanged()
+        val diffRes = DiffUtil.calculateDiff(DiffCallback<D>(mData, data))
+        diffRes.dispatchUpdatesTo(this)
     }
 
     fun setNewData(data: MutableList<D>) {
