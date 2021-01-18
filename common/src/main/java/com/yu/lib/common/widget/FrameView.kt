@@ -35,7 +35,7 @@ class FrameView : FrameLayout {
         progressBar = findViewById(R.id.progress)
         imageView = findViewById(R.id.image)
 
-        mCurColor = ContextCompat.getColor(context, R.color.colorPrimary)
+        mCurColor = ContextCompat.getColor(context, android.R.color.black)
         imageView!!.setColorFilter(mCurColor)
         if (Build.VERSION.SDK_INT >= 21) {
             progressBar!!.indeterminateTintList = ColorStateList.valueOf(mCurColor)

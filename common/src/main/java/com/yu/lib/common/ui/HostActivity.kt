@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.transition.TransitionInflater
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
@@ -21,6 +22,8 @@ class HostActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
 
         val display = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(display)
