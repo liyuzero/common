@@ -51,6 +51,8 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
     private OnItemLongClickListener<T> mTOnItemLongClickListener;
 
     private FooterHelper mFooterHelper;
+    private boolean isEnableLoadMore;
+    private AbsFooterView curFooterView;
 
     public void setLoadMoreOnly2Bottom(boolean loadMoreOnly2Bottom) {
         if (mFooterHelper != null) {
@@ -73,27 +75,24 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
         mCurViewType = 0;
     }
 
-    public void showFooter(boolean isShow) {
-        if (mFooterHelper == null) {
-            return;
-        }
-        mFooterHelper.mFooterView.showAllInfo(isShow);
-    }
-
-    private class FooterHelper implements IFooterView {
+    public class FooterHelper implements IFooterView {
         private static final int BASE_ITEM_TYPE_FOOTER = 200000;
 
-        private FooterView mFooterView;
+        private final AbsFooterView mFooterView;
 
         private boolean mIsLoadMore;
         private boolean mIsNoMore;
         private int mLastVisibleItem;
         private int mTotalItemCount;
-        private boolean mHideNoMoreStr;
         private boolean mLoadMoreOnly2Bottom = true;
 
         FooterHelper(Context context) {
-            mFooterView = new FooterView(context);
+            mFooterView = new DefaultFooterView(context);
+            mIsNoMore = false;
+        }
+
+        FooterHelper(Context context, AbsFooterView footerView) {
+            mFooterView = footerView;
             mIsNoMore = false;
         }
 
@@ -102,7 +101,9 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
         }
 
         private void setHideNoMoreStr(boolean hideNoMoreStr) {
-            mHideNoMoreStr = hideNoMoreStr;
+            if(mFooterView instanceof DefaultFooterView) {
+                ((DefaultFooterView) mFooterView).setHideNoMoreStr(hideNoMoreStr);
+            }
         }
 
         private int getItemViewType(int position) {
@@ -120,7 +121,7 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
             if (viewType == BASE_ITEM_TYPE_FOOTER) {
                 StaggeredGridLayoutManager.LayoutParams params = new StaggeredGridLayoutManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.setFullSpan(true);
-                mFooterView.setLayoutParams(params);
+                ((View) mFooterView).setLayoutParams(params);
                 return new HeaderFooterViewHolder(mFooterView, mFooterView, HeaderFooterViewHolder.class);
             }
             return null;
@@ -166,139 +167,25 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
         }
     }
 
-    //接口其实写死了
-    public interface IFooterView {
-        void stopLoadMoreFail();
+    public static class DefaultFooterView extends AbsFooterView {
+        protected ProgressBar mProgressBar;
+        protected TextView mTextView;
+        private boolean mHideNoMoreStr;
+        private OnClickListener footerClickListener;
 
-        void stopLoadMoreSuccess();
-
-        void stopLoadMoreHideProgress();
-
-        void stopLoadMoreNoMore();
-    }
-
-    private OnFooterClickListener mOnFooterClickListener;
-    private OnLoadMoreListener mOnLoadMoreListener;
-
-    public void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
-        mOnFooterClickListener = onFooterClickListener;
-    }
-
-    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
-        mOnLoadMoreListener = onLoadMoreListener;
-    }
-
-    public interface OnFooterClickListener {
-        void onFooterClick();
-    }
-
-    public interface OnLoadMoreListener {
-        void onLoadMore();
-    }
-
-    public void enableFooterView(RecyclerView recyclerView, final RecyclerView.LayoutManager manager) {
-        mFooterHelper = new FooterHelper(recyclerView.getContext());
-        RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (manager instanceof StaggeredGridLayoutManager) {
-                    StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) manager;
-                    int[] lastPositions = new int[layoutManager.getSpanCount()];
-                    layoutManager.findLastVisibleItemPositions(lastPositions);
-                    mFooterHelper.mLastVisibleItem = findMax(lastPositions);
-                } else if (manager instanceof GridLayoutManager) {
-                    mFooterHelper.mLastVisibleItem = ((GridLayoutManager) manager).findLastVisibleItemPosition();
-                } else if (manager instanceof LinearLayoutManager) {
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) manager;
-                    mFooterHelper.mLastVisibleItem = layoutManager.findLastVisibleItemPosition();
-                } else {
-                    return;
-                }
-                mFooterHelper.mTotalItemCount = manager.getItemCount();
-                if (mFooterHelper.mLoadMoreOnly2Bottom) {
-                    if (!recyclerView.canScrollVertically(1) && recyclerView.canScrollVertically(-1)
-                            && mFooterHelper.mLastVisibleItem == mFooterHelper.mTotalItemCount - 1 && !mFooterHelper.mIsLoadMore && !mFooterHelper.mIsNoMore) {
-                        mFooterHelper.mIsLoadMore = true;
-                        if (mOnLoadMoreListener != null) {
-                            mOnLoadMoreListener.onLoadMore();
-                        }
-                    }
-                } else {
-                    if (mFooterHelper.mLastVisibleItem >= mFooterHelper.mTotalItemCount - 7 && !mFooterHelper.mIsLoadMore && !mFooterHelper.mIsNoMore) {
-                        mFooterHelper.mIsLoadMore = true;
-                        if (mOnLoadMoreListener != null) {
-                            mOnLoadMoreListener.onLoadMore();
-                        }
-                    }
-                }
-            }
-
-            private int findMax(int[] lastPositions) {
-                int max = lastPositions[0];
-                for (int value : lastPositions) {
-                    if (value > max) {
-                        max = value;
-                    }
-                }
-                return max;
-            }
-        };
-        recyclerView.addOnScrollListener(onScrollListener);
-    }
-
-    public void stopLoadMoreFail() {
-        if (mFooterHelper == null) {
-            return;
-        }
-        mFooterHelper.stopLoadMoreFail();
-    }
-
-    public void stopLoadMoreHideProgress() {
-        if (mFooterHelper == null) {
-            return;
-        }
-        mFooterHelper.stopLoadMoreHideProgress();
-    }
-
-    public void stopLoadMoreSuccess() {
-        if (mFooterHelper == null) {
-            return;
-        }
-        mFooterHelper.stopLoadMoreSuccess();
-    }
-
-    public void stopLoadMoreNoMore() {
-        if (mFooterHelper == null) {
-            return;
-        }
-        mFooterHelper.stopLoadMoreNoMore();
-    }
-
-    //重置noMore标示，操蛋的后台设计，sections为空的时候居然前端报错而不是空数据，兼容用
-    public void reset() {
-        mFooterHelper.mIsNoMore = false;
-    }
-
-    class FooterView extends FrameLayout implements IFooterView {
-        private View mRootView;
-        private ProgressBar mProgressBar;
-        private TextView mTextView;
-
-        public FooterView(@NonNull Context context) {
+        public DefaultFooterView(@NonNull Context context) {
             super(context);
             init();
         }
 
-        public FooterView(@NonNull Context context, @Nullable AttributeSet attrs) {
-            super(context, attrs);
-            init();
+        public void setHideNoMoreStr(boolean hideNoMoreStr) {
+            mHideNoMoreStr = hideNoMoreStr;
         }
 
         @SuppressLint("InflateParams")
         private void init() {
-            mRootView = LayoutInflater.from(getContext()).inflate(R.layout.common_adapter_view_footer, null);
-            addView(mRootView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            View rootView = LayoutInflater.from(getContext()).inflate(R.layout.common_adapter_view_footer, null);
+            addView(rootView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             mProgressBar = findViewById(R.id.progress);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mProgressBar.setIndeterminateTintList(ColorStateList.valueOf(0x4C000000));
@@ -331,23 +218,104 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
         public void stopLoadMoreNoMore() {
             mProgressBar.setVisibility(GONE);
             mTextView.setVisibility(VISIBLE);
-            mTextView.setText(mFooterHelper.mHideNoMoreStr ? "" :
+            mTextView.setText(mHideNoMoreStr? "":
                     mTextView.getContext().getResources().getString(R.string.view_type_lib_str_no_more));
             setOnClickListener(null);
         }
 
-        private void showAllInfo(boolean showFooter) {
-            mRootView.setVisibility(showFooter ? VISIBLE : INVISIBLE);
+        public void setFooterClickListener(OnClickListener footerClickListener) {
+            this.footerClickListener = footerClickListener;
         }
 
-        private OnClickListener mOnClickListener = new OnClickListener() {
+        private final OnClickListener mOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mOnFooterClickListener != null) {
-                    mOnFooterClickListener.onFooterClick();
+                if (footerClickListener != null) {
+                    footerClickListener.onClick(v);
                 }
             }
         };
+    }
+
+    //接口其实写死了
+    public static abstract class AbsFooterView extends FrameLayout implements IFooterView {
+        public AbsFooterView(@NonNull Context context) {
+            super(context);
+        }
+
+        public AbsFooterView(@NonNull Context context, @Nullable AttributeSet attrs) {
+            super(context, attrs);
+        }
+    }
+
+    private interface IFooterView {
+        void stopLoadMoreFail();
+        void stopLoadMoreSuccess();
+        void stopLoadMoreHideProgress();
+        void stopLoadMoreNoMore();
+    }
+
+    private OnFooterClickListener mOnFooterClickListener;
+    private OnLoadMoreListener mOnLoadMoreListener;
+
+    public void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
+        mOnFooterClickListener = onFooterClickListener;
+    }
+
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        mOnLoadMoreListener = onLoadMoreListener;
+    }
+
+    public interface OnFooterClickListener {
+        void onFooterClick();
+    }
+
+    public interface OnLoadMoreListener {
+        void onLoadMore();
+    }
+
+    public void setEnableLoadMore(boolean isEnableLoadMore) {
+        this.isEnableLoadMore = isEnableLoadMore;
+    }
+
+    public void setEnableLoadMore(boolean isEnableLoadMore, AbsFooterView footerView) {
+        this.isEnableLoadMore = isEnableLoadMore;
+        this.curFooterView = footerView;
+    }
+
+    public void stopLoadMoreFail() {
+        if (mFooterHelper == null) {
+            return;
+        }
+        mFooterHelper.stopLoadMoreFail();
+    }
+
+    public void stopLoadMoreHideProgress() {
+        if (mFooterHelper == null) {
+            return;
+        }
+        mFooterHelper.stopLoadMoreHideProgress();
+    }
+
+    public void stopLoadMoreSuccess() {
+        if (mFooterHelper == null) {
+            return;
+        }
+        mFooterHelper.stopLoadMoreSuccess();
+    }
+
+    public void stopLoadMoreNoMore() {
+        if (mFooterHelper == null) {
+            return;
+        }
+        mFooterHelper.stopLoadMoreNoMore();
+    }
+
+    //重置noMore标示，操蛋的后台设计，sections为空的时候居然前端报错而不是空数据，兼容用
+    public void reset() {
+        if (mFooterHelper != null) {
+            mFooterHelper.mIsNoMore = false;
+        }
     }
 
     public void clear() {
@@ -380,7 +348,7 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
             }
             holder = new BaseViewHolder(root, itemView, binder.getClass()).setBinder(binder);
             holder.mAdapter = this;
-            binder.onCreateView(holder);
+            binder.onCreateViewHolder(holder);
         } else {
             View view = new View(viewGroup.getContext());
             view.setMinimumHeight(1);
@@ -408,12 +376,8 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
 
         int type = getItemViewType(position);
         BaseItemBinder<T> itemBinder = mViewTypeIntStrBinderMap.get(type);
-        if (itemBinder != null && (holder.mCurBindPos == -1 || holder.mCurBindPos != position)) {
-            holder.mCurBindPos = position;
-            itemBinder.initBindData(holder, position, mData.get(position));
-        }
         if (itemBinder != null) {
-            itemBinder.bindData(holder, position, mData.get(position));
+            itemBinder.onBindViewHolder(holder, position, mData.get(position));
         }
     }
 
@@ -430,13 +394,13 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
                 //不支持的type类型
                 return -1;
             } else {
-                return binder.viewType;
+                return binder.getViewType();
             }
         } else {
             if (mViewTypeIntStrBinderMap.size() > 0) {
                 Iterator<String> iterator = mViewTypeStrBinderMap.keySet().iterator();
                 if (iterator.hasNext()) {
-                    return Objects.requireNonNull(mViewTypeStrBinderMap.get(iterator.next())).viewType;
+                    return Objects.requireNonNull(mViewTypeStrBinderMap.get(iterator.next())).getViewType();
                 } else {
                     return -1;
                 }
@@ -448,6 +412,11 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
 
     public void updateData(List<T> data) {
         mData.clear();
+        mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    public void addData(List<T> data) {
         mData.addAll(data);
         notifyDataSetChanged();
     }
@@ -474,7 +443,7 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
         if (mViewTypeStrBinderMap.get(viewType) == null) {
             itemBinder.setViewTypeStr(viewType);
             mCurViewType++;
-            itemBinder.viewType = mCurViewType;
+            itemBinder.setViewType(mCurViewType);
             mViewTypeStrBinderMap.put(viewType, itemBinder);
             mViewTypeIntStrBinderMap.put(mCurViewType, itemBinder);
             mIntViewTypeStrTypeMap.put(mCurViewType, viewType);
@@ -525,9 +494,9 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
     @Override
     public void onAttachedToRecyclerView(@NotNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-        if (layoutManager instanceof GridLayoutManager) {
-            final GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
+        RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
+        if (manager instanceof GridLayoutManager) {
+            final GridLayoutManager gridLayoutManager = (GridLayoutManager) manager;
             final GridLayoutManager.SpanSizeLookup spanSizeLookup = gridLayoutManager.getSpanSizeLookup();
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
@@ -541,6 +510,67 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
                     return 1;
                 }
             });
+        }
+
+        if (isEnableLoadMore) {
+            mFooterHelper = new FooterHelper(recyclerView.getContext(), curFooterView);
+            if(curFooterView instanceof DefaultFooterView) {
+                ((DefaultFooterView)curFooterView).setFooterClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(mOnFooterClickListener != null) {
+                            mOnFooterClickListener.onFooterClick();
+                        }
+                    }
+                });
+            }
+            RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    if (manager instanceof StaggeredGridLayoutManager) {
+                        StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) manager;
+                        int[] lastPositions = new int[layoutManager.getSpanCount()];
+                        layoutManager.findLastVisibleItemPositions(lastPositions);
+                        mFooterHelper.mLastVisibleItem = findMax(lastPositions);
+                    } else if (manager instanceof GridLayoutManager) {
+                        mFooterHelper.mLastVisibleItem = ((GridLayoutManager) manager).findLastVisibleItemPosition();
+                    } else if (manager instanceof LinearLayoutManager) {
+                        LinearLayoutManager layoutManager = (LinearLayoutManager) manager;
+                        mFooterHelper.mLastVisibleItem = layoutManager.findLastVisibleItemPosition();
+                    } else {
+                        return;
+                    }
+                    mFooterHelper.mTotalItemCount = manager.getItemCount();
+                    if (mFooterHelper.mLoadMoreOnly2Bottom) {
+                        if (!recyclerView.canScrollVertically(1) && recyclerView.canScrollVertically(-1)
+                                && mFooterHelper.mLastVisibleItem == mFooterHelper.mTotalItemCount - 1 && !mFooterHelper.mIsLoadMore && !mFooterHelper.mIsNoMore) {
+                            mFooterHelper.mIsLoadMore = true;
+                            if (mOnLoadMoreListener != null) {
+                                mOnLoadMoreListener.onLoadMore();
+                            }
+                        }
+                    } else {
+                        if (mFooterHelper.mLastVisibleItem >= mFooterHelper.mTotalItemCount - 7 && !mFooterHelper.mIsLoadMore && !mFooterHelper.mIsNoMore) {
+                            mFooterHelper.mIsLoadMore = true;
+                            if (mOnLoadMoreListener != null) {
+                                mOnLoadMoreListener.onLoadMore();
+                            }
+                        }
+                    }
+                }
+
+                private int findMax(int[] lastPositions) {
+                    int max = lastPositions[0];
+                    for (int value : lastPositions) {
+                        if (value > max) {
+                            max = value;
+                        }
+                    }
+                    return max;
+                }
+            };
+            recyclerView.addOnScrollListener(onScrollListener);
         }
     }
 
@@ -565,7 +595,6 @@ public class MultiRecyclerAdapter<T> extends RecyclerView.Adapter<MultiRecyclerA
         private MultiRecyclerAdapter mAdapter;
         //view 缓存map
         private SparseArray<View> mViewMap;
-        private int mCurBindPos = -1;
         private View mContentView;
 
         private Object mTag;
